@@ -62,14 +62,20 @@ void display()
 
 void deleteaparticular(int val)
 {
-    struct node *ptr, *prevptr;
+    struct node *ptr, *prevptr, *temp;
     ptr = head;
+    if(head->data==val){
+        temp = head;
+        head = head->next;
+        free(temp);
+        return;
+    }
     while (ptr->data != val && ptr->next != NULL)
     {
         prevptr = ptr;
         ptr = ptr->next;
     }
-    if (ptr->data != val)
+    if (ptr->data != val && head->data!=val)
     {
         printf("\nvalue doesn't exist in the list\n");
     }
