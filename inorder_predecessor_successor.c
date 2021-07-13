@@ -24,32 +24,25 @@ struct node *createnew(int key)
 void add(struct node *root, int key)
 {
     struct node *newnode = createnew(key);
-    if (root == 0)
+    struct node *p = root, *q;
+    while (p != 0)
     {
-        root = newnode;
-    }
-    else
-    {
-        struct node *p = root;
-        while (p != 0)
-        {
-            if (p->data > key && p->left != 0)
-            {
-                p = p->left;
-            }
-            else if (p->right != 0)
-            {
-                p = p->right;
-            }
-            else
-                break;
-        }
+        q = p;
         if (p->data > key)
-            p->left = newnode;
+        {
+            p = p->left;
+        }
+
         else
         {
-            p->right = newnode;
+            p = p->right;
         }
+    }
+    if (q->data > key)
+        q->left = newnode;
+    else
+    {
+        q->right = newnode;
     }
 }
 
@@ -64,74 +57,139 @@ void inorder(struct node *root)
     inorder(root->right);
 }
 
+void printinorder(struct node *root)
+{
+    printf("Inorder : ");
+    inorder(root);
+    printf("\n");
+}
+
 struct node *inorder_successor(struct node *root)
 {
     struct node *p = root;
-    struct node *prev = 0;
-    if (p->right != 0)
-    {
-        p = p->right;
-    }
-    else
+
+    if (p->right == 0)
     {
         printf("No inorder successor exists\n");
         return 0;
     }
-    while (p->left != 0)
+    else
     {
-        prev = p;
-        p = p->left;
+        p = p->right;
+
+        while (p->left)
+        {
+
+            p = p->left;
+        }
+        return p;
     }
-    prev->left=0;
-    return p;
 }
 
 struct node *inorder_predecessor(struct node *root)
 {
     struct node *p = root;
     struct node *prev = 0;
-    if (p->left != 0)
-    {
-        p = p->left;
-    }
-    else
+    if (p->left == 0)
     {
         printf("No inorder predecessor exists\n");
         return 0;
     }
-    while (p->right != 0)
+    else
     {
-        prev = p;
-        p = p->right;
+        p = p->left;
+
+        while (p->right != 0)
+        {
+
+            p = p->right;
+        }
+        return p;
     }
-    prev->right=0;
-    return p;
 }
 
-struct node *search(struct node *root,int findkey)
+struct node *search(struct node *root, int findkey)
 {
-    struct node *p = root;
-    if (p->left==0 && p->right==0)
-    {
-        printf("Key not found");
-        exit(0);
-    }
-
-    if(p->data==findkey)
+    struct node *p = 0;
+    p = root;
+    if (p == 0)
+        return 0;
+    if (p->data == findkey)
     {
         return p;
     }
-    else if (p->data>findkey)
+    else if (p->data > findkey)
     {
-        return search(p->left,findkey);
+        return search(p->left, findkey);
     }
-    else if (p->data<findkey)
+    else
     {
-        return search(p->right,findkey);
+        return search(p->right, findkey);
     }
-
-
 }
+
+void print_succ_pred(struct node *root)
+{
+    int findkey;
+    printf("Enter the key of which you want to find the inorder predecessor and successor : ");
+    scanf("%d", &findkey);
+
+    struct node *find = search(root, findkey);
+    printf("press 1 to find inorder successor\n");
+    printf("press 2 to find inorder predecessor\n");
+    int choice;
+    scanf("%d", &choice);
+    if (choice == 1)
+    {
+        struct node *is;
+        is = inorder_successor(find);
+        if (is != 0)
+        {
+            printf("Inorder successor of %d : %d\n", find->data, is->data);
+        }
+    }
+    else if (choice == 2)
+    {
+        struct node *ip = inorder_predecessor(find);
+        if (ip != 0)
+        {
+            printf("Inorder predecessor %d : %d\n", find->data, ip->data);
+        }
+    }
+    else
+    {
+        printf("Invalid input");
+    }
+}
+
+void get_parent(struct node *root)
+{
+    printf("Enter the element to get parent : ");
+    int get;
+    scanf("%d", &get);
+    struct node *p = root, *prev = 0;
+    while (1)
+    {
+        if (p->data == get)
+        {
+            printf("%d is the parent of %d\n", prev->data, get);
+            return;
+        }
+        else if (p->data > get)
+        {
+            prev = p;
+            p = p->left;
+        }
+        else if (p->data < get)
+        {
+            prev = p;
+            p = p->right;
+        }
+    }
+    printf("Its NULL\n");
+}
+
+
 int main()
 {
     struct node *root = 0;
@@ -148,29 +206,33 @@ int main()
             break;
         add(root, key);
     }
-
-    struct node *find=0;
-    int findkey;
-    printf("Enter the key of which you want to find the inorder predecessor and successor : ");
-    scanf("%d",&findkey);
-    find = search(root,findkey);
-    printf("to find : %d",find->data);
-
-    struct node *is = inorder_successor(find);
-    struct node *ip = inorder_predecessor(find);
-
-    if(inorder_successor(find)!=0)
+    while (1)
     {
-        printf("Inorder successor of %d : %d\n",find->data, is->data);
-        //root = is;
+        int choice;
+        printf("to find inorder successor/predecessor press 1\n");    
+        printf("to find the parent node press 2\n");
+        printf("To view tree press 3\n");
+        scanf("%d",&choice);
+        if(choice==1)
+        {
+            print_succ_pred(root);
+        }
+        else if (choice==2)
+        {
+            get_parent(root);
+        }
+        else if (choice==3)
+        {
+            printinorder(root);
+            break;
+        }
+        else{
+            printf("INvalid input");
+            break;
+        }
     }
-    if(inorder_predecessor(find)!=0)
-    {
-        printf("Inorder predecessor %d : %d\n",find->data, ip->data);
-    }
+    
+    
 
-
-    printf("Inorder : ");
-    inorder(root);
     return 0;
 }
