@@ -1,0 +1,168 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+struct tree 
+{
+    int data;
+    struct tree *left, *right;
+    int height;
+};
+
+int height(struct tree *t)
+{
+    if(t==0)return 0;
+    return t->height;
+}
+
+int check_balance(struct tree *t)
+{
+    if(t==0)return 0;
+    return height(t->left)-height(t->right);
+}
+
+int max(int a, int b)
+{
+    if(a>=b)return a;
+    else return b;
+}
+
+struct tree *right_rotate(struct tree *t)
+{
+    struct tree *x = t->left;
+    struct tree *y = x->right;
+
+    x->right=t;
+    t->left=y;
+
+    return x;
+}
+
+struct tree *left_rotate(struct tree *t)
+{
+    struct tree *x=t->right;
+    struct tree *y = x->left;
+
+    x->left=t;
+    t->right=y;
+
+    return x;
+}
+
+struct tree *new(int key)
+{
+    struct tree *t = (struct tree *)malloc(sizeof(struct tree *));
+    t->data=key;
+    t->left=t->right=0;
+    t->height=1;
+}
+
+struct tree *add(struct tree *root, int key)
+{
+    
+    if(root==NULL)return new(key);
+
+    if(key > root->data)
+    {
+        root->right= add(root->right,key);
+    }
+    else if (key < root->data)
+    {
+        root->left= add(root->left,key);
+    }
+    else 
+    {
+        return root;
+    }
+    int b = check_balance(root);
+    
+    //left left case
+    if(b > 1 && key <  root->left->data)
+    {
+        return right_rotate(root);
+    }
+    //right right case
+    else if (b < -1 && key > root->right->data)
+    {
+        return left_rotate(root);
+    }
+    //left right case
+    else if (b > 1 && key > root->left->data)
+    {
+        root->left=left_rotate(root->left);
+        return right_rotate(root);
+    }
+    //right left case
+    else if (b< -1 && key< root->right->data)
+    {
+        root->right=right_rotate(root->right);
+        return left_rotate(root);
+    }
+
+    return root;
+}
+
+void inorder(struct tree *root)
+{
+    if (root == 0)
+    {
+        return;
+    }
+    inorder(root->left);
+    printf("%d ", root->data);
+    inorder(root->right);
+}
+
+void printinorder(struct tree *root)
+{
+    printf("Inorder : ");
+    inorder(root);
+    printf("\n");
+}
+
+void get_parent(struct tree *root)
+{
+    printf("Enter the element to get parent : ");
+    int get;
+    scanf("%d", &get);
+    struct tree *p = root, *prev = 0;
+    while (1)
+    {
+        if (p->data == get)
+        {
+            printf("%d is the parent of %d\n", prev->data, get);
+            return;
+        }
+        else if (p->data > get)
+        {
+            prev = p;
+            p = p->left;
+        }
+        else if (p->data < get)
+        {
+            prev = p;
+            p = p->right;
+        }
+    }
+    printf("Its NULL\n");
+}
+
+int main()
+{
+    struct tree *root=0;
+    while (1)
+    {
+        int key;
+        printf("Enter data : ");
+        scanf("%d",&key);
+        if(key==-1)
+        {
+            printf("End of input\n");
+            break;
+        }
+        root = add(root,key);    
+    }
+    printinorder(root);
+    get_parent(root);
+    return 0;
+}
