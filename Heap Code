@@ -4,7 +4,7 @@
 
 int heap[100], heapsize = 0;
 
-void insert_min(int key)
+void insert_min(int key)    //for min heap
 {
     heap[0] = -1;
     heapsize++;
