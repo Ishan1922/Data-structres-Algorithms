@@ -1,0 +1,131 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <limits.h>
+
+int heap[100], heapsize = 0;
+
+void insert_min(int key)
+{
+    heap[0] = -1;
+    heapsize++;
+    heap[heapsize] = key;
+    int now = heapsize;
+    while (heap[now / 2] > key)
+    {
+        heap[now] = heap[now / 2];
+        now = now / 2;
+    }
+
+    heap[now] = key;
+}
+
+void insert_max(int key)
+{
+    heap[0] = -1;
+    heapsize++;
+    heap[heapsize] = key;
+    int now = heapsize;
+    while (now != 1 && heap[now / 2] < key)
+    {
+        heap[now] = heap[now / 2];
+        now = now / 2;
+        if (now == 0)
+            break;
+    }
+
+    heap[now] = key;
+}
+
+int del_min()
+{
+    int min = heap[1];
+    int last = heap[heapsize];
+    heapsize--;
+    int now, child;
+
+    for (now = 1; now * 2 <= heapsize; now = child)
+    {
+        child = now * 2;
+        if (child != heapsize && heap[child + 1] < heap[child])
+        {
+            child++;
+        }
+        if (last > heap[child])
+        {
+            heap[now] = heap[child];
+        }
+        else
+            break;
+    }
+    heap[now] = last;
+    return min;
+}
+
+int del_max()
+{
+    int max = heap[1];
+    int last = heap[heapsize--];
+    int child, now;
+    for (now = 1; now * 2 <= heapsize; now = child)
+    {
+        child = now * 2;
+        if (heap[child + 1] > heap[child])
+        {
+            child++;
+        }
+        if (last < heap[child])
+        {
+            heap[now] = heap[child];
+        }
+        else
+            break;
+    }
+    heap[now] = last;
+    return max;
+}
+int main()
+{
+    int choice;
+    printf("Press 1 to create max heap and 2 for min heap : ");
+    scanf("%d", &choice);
+    if (choice == 1)
+    {
+        int num1;
+        printf("Enter the number of elements : ");
+        scanf("%d", &num1);
+        printf("Enter the numbers : ");
+        for (int i = 0; i < num1; i++)
+        {
+            int c;
+            scanf("%d", &c);
+            insert_max(c);
+        }
+        int n = heapsize;
+        for (int i = 0; i < n; i++)
+        {
+            printf("%d ", del_max());
+        }
+    }
+    else if (choice == 2)
+    {
+        int num2;
+        printf("Enter the number of elements : ");
+        scanf("%d", &num2);
+        printf("Enter the numbers : ");
+        for (int i = 0; i < num2; i++)
+        {
+            int c;
+            scanf("%d", &c);
+            insert_min(c);
+        }
+        int n = heapsize;
+        for (int i = 0; i < n; i++)
+        {
+            printf("%d ", del_min());
+        }
+    }
+    else printf("Invalid Input");
+
+    return 0;
+}
